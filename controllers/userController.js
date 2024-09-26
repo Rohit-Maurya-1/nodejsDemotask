@@ -4,9 +4,16 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const saltRounds = 10;
 module.exports.createUser = async (req, res) => {
-  const { name, email, password, address, latitude, longitude, status } =
-    req.body;
+  const { name, email, password, address, latitude, longitude, status } = req.body;
   try {
+    if(!name||!email||!password||!address||!latitude||!longitude){
+      return res.status(400).json({
+        message: "all field is required!",
+        status: 400,
+        response: {},
+      })
+    }
+    
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({
@@ -133,11 +140,6 @@ module.exports.createDistance = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
-
-  
-  
-
 //=====================================================weekday user data get===============
 module.exports.users = async (req, res) => {
   try {
