@@ -96,52 +96,45 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 module.exports.createDistance = async (req, res) => {
-    try {
-      const { latitude, longitude } = req.query;
-  
-      // Validate the destination coordinates
-      if (!latitude || !longitude) {
-        return res.status(400).json({ message: "Destination coordinates are required." });
-      }
-  
-      // Ensure user is authenticated and attached by the middleware
-      const userId = req.user._id; // req.user is attached by the authMiddleware
-      
-      console.log(`User ID: ${userId}`); // Debugging: Check if userId is correct
-  
-      // Fetch user data from the database
-      const user = await User.findById(userId);
-  
-      // Check if user exists and has latitude/longitude
-      if (!user) {
-        return res.status(404).json({ message: "User not found." });
-      }
-  
-      if (!user.latitude || !user.longitude) {
-        console.log("User found, but latitude or longitude is missing:", user); // Debugging: Check user data
-        return res.status(404).json({ message: "User location not found." });
-      }
-  
-      console.log(`User Latitude: ${user.latitude}, User Longitude: ${user.longitude}`); // Debugging: Check user's location
-  
-      // Calculate the distance between user's current location and the destination
-      const distance = calculateDistance(
-        user.latitude,
-        user.longitude,
-        parseFloat(latitude),
-        parseFloat(longitude)
-      );
-  
-      // Return the distance formatted in kilometers
-      res.status(200).json({
-        message: "Distance calculated successfully",
-        distance: `${distance.toFixed(2)} km`,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server error", error });
+  try {
+    const { latitude, longitude } = req.query;
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({ message: "Destination coordinates are required." });
     }
-  };
+
+    const userId = req.user._id;
+    console.log(`User ID: ${userId}`); // Debugging: Check if userId is correct
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (!user.latitude || !user.longitude) {
+      return res.status(404).json({ message: "User location not found." });
+    }
+
+    // Calculate distance (assuming calculateDistance is implemented)
+    const distance = calculateDistance(
+      user.latitude,
+      user.longitude,
+      parseFloat(latitude),
+      parseFloat(longitude)
+    );
+
+    res.status(200).json({
+      message: "Distance calculated successfully",
+      distance: `${distance.toFixed(2)} km`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
   
   
 
